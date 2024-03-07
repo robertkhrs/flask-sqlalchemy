@@ -1,14 +1,16 @@
-from flask import render_template, redirect, abort, request
+from flask import render_template, redirect, abort, request, make_response, jsonify
 from flask import Flask
 from flask_login import login_user, LoginManager, login_required, logout_user, current_user
 
-from data import db_session
-from data.db_session import global_init, create_session
+from data.db_session import global_init
 from data.news import News
 from data.users import User
 from forms.login import LoginForm
 from forms.news import NewsForm
 from forms.user import RegisterForm
+
+from data import db_session
+from api import news_api, jobs_api
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'yandexlyceum_secret_key'
@@ -26,16 +28,6 @@ def index():
     else:
         news = db_sess.query(News).filter(News.is_private != True)
     return render_template("index.html", news=news)
-
-
-@app.route('/promotion')
-def promotion():
-    countdown_list = ['Человечество вырастает из детства.',
-                      'Человечеству мала одна планета.',
-                      'Мы сделаем обитаемыми безжизненные пока планеты.',
-                      'И начнем с Марса!',
-                      'Присоединяйся!']
-    return '</br>'.join(countdown_list)
 
 
 @app.route('/image_mars')
@@ -174,5 +166,17 @@ def logout():
     return redirect("/")
 
 
+@app.errorhandler(404)
+def not_found(error):
+    return make_response(jsonify({'error': 'Not found'}), 404)
+
+
+@app.errorhandler(400)
+def bad_request(_):
+    return make_response(jsonify({'error': 'Bad Request'}), 400)
+
+
+app.register_blueprint(news_api.blueprint)
+app.register_blueprint(jobs_api.blueprint)
 if __name__ == '__main__':
     app.run(port=8080, host='127.0.0.1')
