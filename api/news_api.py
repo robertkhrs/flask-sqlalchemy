@@ -2,6 +2,7 @@ import flask
 from data import db_session
 
 from data.db_session import create_session
+from data.jobs import Jobs
 from data.news import News
 from flask import jsonify, make_response, request
 
@@ -16,6 +17,7 @@ blueprint = flask.Blueprint(
 def get_news():
     session = create_session()
     _news = session.query(News).all()
+    _news = session.query(Jobs).all()
     return jsonify({
         'data': [item.to_dict(only=('title', 'content', 'id')) for item in _news]
     })
