@@ -16,7 +16,7 @@ app = Flask(__name__)
 app.config['SECRET_KEY'] = 'yandexlyceum_secret_key'
 login_manager = LoginManager()
 login_manager.init_app(app)
-global_init('db/blogs.db')
+global_init('db/blogs2.db')
 
 
 @app.route("/")
